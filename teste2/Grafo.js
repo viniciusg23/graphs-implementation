@@ -79,6 +79,10 @@ export default class Graph {
         }
     }
 
+    gerarMatriz(){
+        
+    }
+
     warshall(){
 
     }
