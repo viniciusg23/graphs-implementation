@@ -1,27 +1,29 @@
+import Vertice from "./Vertice";
+
 export default class Aresta{
-    private origem: number;
-    private destino: number;
+    private origem: Vertice;
+    private destino: Vertice;
     private peso: number;
 
-    public constructor(origem: number, destino: number, peso: number){
+    public constructor(origem: Vertice, destino: Vertice, peso?: number){
         this.origem = origem;
         this.destino = destino;
-        this.peso = peso;
+        this.peso = 0;
     }
 
-    get getOrigem(): number{
+    get getOrigem(): Vertice{
         return this.origem;
     }
 
-    set setOrigem(origem: number){
+    set setOrigem(origem: Vertice){
         this.origem = origem;
     }
 
-    get getDestino(): number{
+    get getDestino(): Vertice{
         return this.destino;
     }
 
-    set setDestino(destino: number){
+    set setDestino(destino: Vertice){
         this.destino = destino;
     }
 
@@ -31,6 +33,10 @@ export default class Aresta{
 
     set setPeso(peso: number){
         this.peso = peso;
+    }
+
+    idDestino(){
+        return this.destino.getId;
     }
 
 }
