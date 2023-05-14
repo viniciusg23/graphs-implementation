@@ -2,12 +2,23 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class Grafo {
+
+    private Integer base;
+    private Integer antibase;
     private int numVertices;
     private Map<Integer, List<Aresta>> vertices;
-
     public Grafo(int numVertices){
         this.numVertices = numVertices;
         this.vertices = new HashMap<Integer, List<Aresta>>();
+
+    }
+
+    public Integer getBase() {
+        return base;
+    }
+
+    public Integer getAntibase() {
+        return antibase;
     }
 
     public void addVertice(Vertice vertice){
@@ -77,19 +88,77 @@ public class Grafo {
                     visitados.add(idAdjacente);
                 }
             }
-        }
 
+        }
         return visitados;
     }
 
-    public List<Integer> getFechoTransitivoInverso(Vertice origem) {
-        List<Integer> visitados = new ArrayList<>();0
 
-        for (Vertice v : this.vertices) {
-            List<Integer> visitadosNoBfs = bfs(v);
-            for (int id : visitadosNoBfs) {
-                if (!visitados.contains(id)) {
-                    visitados.add(id);
+    public List<Integer> encontrarBase() {
+        int maiorFechoTransitivo = -1;
+        List<Integer> bases = new ArrayList<>();
+
+        for (int i = 0; i < numVertices; i++) {
+            List<Integer> fechoTransitivo = bfs(new Vertice(i));
+            int tamanhoFechoTransitivo = fechoTransitivo.size();
+            if (tamanhoFechoTransitivo > maiorFechoTransitivo) {
+                bases.clear();
+                bases.add(i);
+                maiorFechoTransitivo = tamanhoFechoTransitivo;
+            } else if (tamanhoFechoTransitivo == maiorFechoTransitivo) {
+                bases.add(i);
+            }
+        }
+
+        return bases;
+    }
+
+
+    public List<Integer> encontrarAntiBase() {
+        int menorFechoTransitivo = Integer.MAX_VALUE;
+        int indiceBase = -1;
+        List<Integer> antibase = new ArrayList<>();
+
+        for (int i = 0; i < numVertices; i++) {
+            List<Integer> fechoTransitivo = bfs(new Vertice(i));
+            int tamanhoFechoTransitivo = fechoTransitivo.size();
+
+            if (tamanhoFechoTransitivo < menorFechoTransitivo) {
+                menorFechoTransitivo = tamanhoFechoTransitivo;
+                indiceBase = i;
+                antibase.clear();
+                antibase.add(i);
+            } else if (tamanhoFechoTransitivo == 1) {
+                antibase.add(i);
+            }
+        }
+
+        return antibase;
+    }
+
+
+
+
+
+    public List<Integer> transitivoInverso(Vertice origem) {
+        List<Integer> visitados = new ArrayList<>();
+        Stack<Vertice> pilha = new Stack<>();
+        Map<Integer, List<Aresta>> arestasInvertidas = inverterArestas();
+
+        pilha.add(origem);
+        visitados.add(origem.getId());
+
+        while (!pilha.isEmpty()) {
+            Vertice atual = pilha.pop();
+            List<Aresta> vizinhos = arestasInvertidas.get(atual.getId());
+            if (vizinhos == null) {
+                continue;
+            }
+            for (Aresta adjacente : vizinhos) {
+                int idAdjacente = adjacente.destino.getId();
+                if (!visitados.contains(idAdjacente)) {
+                    pilha.push(adjacente.destino);
+                    visitados.add(idAdjacente);
                 }
             }
         }
@@ -97,10 +166,22 @@ public class Grafo {
         return visitados;
     }
 
-
-
-
-
+    private Map<Integer, List<Aresta>> inverterArestas() {
+        Map<Integer, List<Aresta>> arestasInvertidas = new HashMap<>();
+        for (Integer origem : vertices.keySet()) {
+            List<Aresta> arestas = vertices.get(origem);
+            for (Aresta aresta : arestas) {
+                int destino = aresta.destino.getId();
+                List<Aresta> arestasDestino = arestasInvertidas.get(destino);
+                if (arestasDestino == null) {
+                    arestasDestino = new ArrayList<>();
+                    arestasInvertidas.put(destino, arestasDestino);
+                }
+                arestasDestino.add(new Aresta(aresta.destino, new Vertice(origem), aresta.getPeso()));
+            }
+        }
+        return arestasInvertidas;
+    }
 
 
 
