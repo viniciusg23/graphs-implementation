@@ -90,7 +90,7 @@ export default class Grafo {
     gerarMatriz(): number[][]{
         const matriz: Array<Array<number>> = new Array(this.numVertices);
         for(let i = 0; i < this.numVertices; i++){
-            matriz[i] = new Array(this.numVertices).fill(Infinity);
+            matriz[i] = new Array(this.numVertices).fill(0);
         }
 
         const todosVertices = this.vertices.keys();
@@ -106,7 +106,7 @@ export default class Grafo {
                 else if(adjacentes){
                     for(const a of adjacentes){
                         if(a.getDestino == coluna){
-                            matriz[linha][coluna] = a.getPeso;
+                            matriz[linha][coluna] = 1;
                             break;
                         }
                     }
@@ -118,9 +118,44 @@ export default class Grafo {
 
     }
 
-    warshall(){
+    /**
+     * Método para gerar uma matriz de fechos transitivos diretos de um grafo qualquer utilizando o algoritmo de warshall
+     * @param matriz um grafo em forma de matriz de adjacencia
+     * @returns uma matriz que representa os fechos transitivos diretos que um grafo
+     */
+    fechosDiretosWarshall(matriz: number[][]){
+        for(let i = 0; i < this.numVertices; i++){
+            matriz[i][i] = 1;
+        }    
+        for(let k = 0; k < this.numVertices; k++){
+            for(let i = 0; i < this.numVertices; i++){
+                for(let j = 0; j < this.numVertices; j++){
+                    if(matriz[i][j] == 0 && matriz[i][k] == 1 && matriz[k][j] == 1){
+                        matriz[i][j] = 1;
+                    }
+                }
+            }
+        }
 
+        return matriz;
     }
 
+    fechosIndiretosWarshall(matriz: number[][]){
+        for(let i = 0; i < this.numVertices; i++){
+            matriz[i][i] = 1;
+        }
+    
+        for(let k = 0; k < this.numVertices; k++){
+            for(let i = 0; i < this.numVertices; i++){
+                for(let j = 0; j < this.numVertices; j++){
+                    if(matriz[i][j] == 0 && matriz[k][j] == 1 && matriz[i][k] == 1){
+                        matriz[i][j] = 1;
+                    }
+                }
+            }
+        }
+    
+        return matriz;
+    }
     
 }
