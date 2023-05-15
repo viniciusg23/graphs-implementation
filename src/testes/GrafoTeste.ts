@@ -1,4 +1,5 @@
 import Grafo from "../Grafo";
+import Vertice from "../Vertice";
 
 const grafo = new Grafo(13);
 
@@ -21,21 +22,38 @@ grafo.addAresta(5, 10, 1)
 grafo.addAresta(5, 11, 1)
 
 
+
 let matriz = grafo.gerarMatriz();
+console.log("Matriz de Adjacencia")
 imprimirMatriz(matriz);
 
 
-// const bfs = grafo.bfs(grafo.localizarVertice(0));
-// console.log(bfs);
+const fechosTransitivos = grafo.fechoTransitivoWarshall(matriz);
+console.log("Matriz de Fechos Transitivos - Warshall")
+imprimirMatriz(fechosTransitivos);
 
-// const bfsFechosTransitivos = grafo.fechoTransitivoBFS();
-// console.log(bfsFechosTransitivos);
+const baseWarshall = grafo.gerarBase(fechosTransitivos);
+const antiBaseWarshall = grafo.gerarAntiBase(fechosTransitivos);
 
-// grafo.fechoTransitivoBFS();
+console.log("Vertices da Base do Grafo a partir da matriz de Warshall");
+console.log(baseWarshall);
+
+console.log("Vertices da AntiBase do Grafo a partir da matriz de Warshall");
+console.log(antiBaseWarshall);
+
+const bfsFechosTransitivosDiretos = grafo.fechoTransitivoNaive();
+console.log("Fechos Transitivos - Naive");
+imprimirMatriz(bfsFechosTransitivosDiretos);
 
 
-// const inversos = grafo.fechoTransitivoWarshall(matriz);
-// imprimirMatriz(inversos);
+const baseNaive = grafo.gerarBase(bfsFechosTransitivosDiretos);
+const antiBaseNaive = grafo.gerarAntiBase(bfsFechosTransitivosDiretos);
+
+console.log("Vertices da Base do Grafo a partir da matriz de Naive");
+console.log(baseNaive);
+
+console.log("Vertices da AntiBase do Grafo a partir da matriz de Naive");
+console.log(antiBaseNaive);
 
 
 

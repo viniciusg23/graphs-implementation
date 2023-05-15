@@ -71,7 +71,10 @@ export default class Grafo {
       
 
     
-
+    /**
+     * Gera uma matriz a partir do objeto instanciado e dos vértices e arestas que foram adicionados a ele.
+     * @returns uma matriz de adjacencia do grafo
+     */
     gerarMatriz(): number[][]{
         const matriz: Array<Array<number>> = new Array(this.numVertices);
         for(let i = 0; i < this.numVertices; i++){
@@ -103,19 +106,21 @@ export default class Grafo {
     }
 
     /**
-     * 
-     * @param origem 
-     * @returns 
+     * Algoritmo de busca em largura para buscar todos os vértices que são alcançaveis a partir de um vértice de origem 
+     * @param origem vertice de origem para a busca em largura
+     * @returns array de vértices que são alcançaveis pelo vértice de origem
      */
     bfs(origem: Vertice){
         const distancia: number[] = [];
         const arvore: Vertice[] | null[] = [];
+        const matrizAdjacentes: number[] = [];
         const fila: Vertice[] = [];
 
         for(let i = 0; i < this.numVertices; i++){
             this.vertices[i].setVisitado = false;
             distancia[i] = Infinity;
             arvore[i] = null
+            matrizAdjacentes[i] = 0;
         }
 
         this.vertices[origem.getId].visitar();
@@ -131,6 +136,7 @@ export default class Grafo {
                     if(!vizinho.getVisitado){
                         vizinho.visitar();
                         arvore[vizinho.getId] = vizinho;
+                        matrizAdjacentes[vizinho.getId] = 1;
                         distancia[vizinho.getId] = distancia[v.getId] + 1;
                         fila.push(vizinho);
                     }
@@ -141,24 +147,23 @@ export default class Grafo {
         }
 
         arvore[origem.getId] = origem;
-        // console.log(arvore);
-        return arvore;
+        matrizAdjacentes[origem.getId] = 1;
+        return matrizAdjacentes;
     }
 
+
     /**
-     * 
-     * @returns 
+     * Gera uma matriz de fechos transitivos a partir da busca em largura
+     * @returns matriz de fechos transitivos do grafo
      */
-    fechoTransitivoBFS(){
-        const fechosTransitivos: Array<Array<Vertice> | Array<null>>  = [];
+    fechoTransitivoNaive(){
+        const fechosTransitivos: Array<Array<number>>  = [];
         for(const vertice of this.vertices){
             fechosTransitivos.push(this.bfs(vertice));
         }
 
         return fechosTransitivos;
     }
-
-
 
 
     /**
@@ -183,6 +188,65 @@ export default class Grafo {
         }
 
         return matriz;
+    }
+
+
+    /**
+     * Esse método gera um array com os ids dos vértices que são a base de um grafo a partir de uma matriz de fecho transitivo do mesmo grafo
+     * @param matrizFechosTransitivos uma matriz de adjacencia que represete os fechos transitivos de todos os pares de vértice de um grafo
+     * @returns um array com o id de todos os vértices que pertencem a anti base 
+     */
+    gerarBase(matrizFechosTransitivos: number[][]){
+        const base: number[] = [];
+
+        for(let coluna = 0; coluna < this.numVertices; coluna++){
+            let eBase = true;
+           
+
+            for(let linha = 0; linha < this.numVertices; linha++){
+  
+                if(linha != coluna && matrizFechosTransitivos[linha][coluna] == 1){
+                    eBase = false;
+                }
+                
+            }
+
+            if(eBase){
+                base.push(coluna);
+            }
+        }
+
+        return base;
+
+    }
+
+
+    /**
+     * Esse método gera um array com os ids dos vértices que são a anti base de um grafo a partir de uma matriz de fecho transitivo do mesmo grafo
+     * @param matrizFechosTransitivos uma matriz de adjacencia que represete os fechos transitivos de todos os pares de vértice de um grafo
+     * @returns um array com o id de todos os vértices que pertencem a anti base
+     */
+    gerarAntiBase(matrizFechosTransitivos: number[][]){
+        const antiBase: number[] = [];
+
+        for(let linha = 0; linha < this.numVertices; linha++){
+            let eAntiBase = true;
+           
+
+            for(let coluna = 0; coluna < this.numVertices; coluna++){
+  
+                if(linha != coluna && matrizFechosTransitivos[linha][coluna] == 1){
+                    eAntiBase = false;
+                }
+                
+            }
+
+            if(eAntiBase){
+                antiBase.push(linha);
+            }
+        }
+
+        return antiBase;  
     }
 
 
